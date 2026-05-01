@@ -3,282 +3,516 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Генератор маркетингового отчёта</title>
+  <title>ReportAI — маркетинговые отчёты</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0c0f14;
-      --surface: #151a22;
-      --surface-hover: #1c2330;
-      --border: #2a3444;
-      --text: #e8edf4;
-      --text-muted: #8b9cb3;
-      --accent: #3d8bfd;
-      --accent-dim: #2563eb;
-      --success-bg: rgba(34, 197, 94, 0.12);
-      --success-border: rgba(34, 197, 94, 0.35);
-      --error-bg: rgba(239, 68, 68, 0.12);
-      --error-border: rgba(239, 68, 68, 0.4);
-      --radius: 12px;
-      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --bg-a: #0a0a1a;
+      --bg-b: #1a0533;
+      --text: #f4f4f8;
+      --text-muted: rgba(244, 244, 248, 0.55);
+      --glass-bg: rgba(255, 255, 255, 0.06);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --input-bg: rgba(8, 6, 20, 0.45);
+      --error: #fb7185;
+      --success: #86efac;
+      --radius: 16px;
+      --font: "Inter", system-ui, -apple-system, sans-serif;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     * {
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
-      min-height: 100vh;
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-      background-image:
-        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(61, 139, 253, 0.15), transparent),
-        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(37, 99, 235, 0.08), transparent);
+      min-height: 100%;
     }
 
-    .wrap {
-      max-width: 560px;
-      margin: 0 auto;
-      padding: 2.5rem 1.25rem 3rem;
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      line-height: 1.55;
+      background: linear-gradient(165deg, var(--bg-a) 0%, var(--bg-b) 55%, #0d0618 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
     }
+
+    .bg-stage {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.55;
+      animation: blob-float 18s var(--ease-out) infinite;
+    }
+
+    .blob-1 {
+      width: min(42vw, 380px);
+      height: min(42vw, 380px);
+      background: #6366f1;
+      top: -8%;
+      left: -6%;
+      animation-delay: 0s;
+    }
+
+    .blob-2 {
+      width: min(50vw, 460px);
+      height: min(50vw, 460px);
+      background: #7c3aed;
+      bottom: -12%;
+      right: -10%;
+      animation-delay: -6s;
+      animation-duration: 22s;
+    }
+
+    .blob-3 {
+      width: min(38vw, 340px);
+      height: min(38vw, 340px);
+      background: #0ea5e9;
+      top: 38%;
+      left: 45%;
+      transform: translateX(-50%);
+      animation-delay: -11s;
+      animation-duration: 20s;
+      opacity: 0.4;
+    }
+
+    @keyframes blob-float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(4%, 6%) scale(1.06); }
+      66% { transform: translate(-5%, 3%) scale(0.96); }
+    }
+
+    @keyframes fade-in-up {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-in {
+      animation: fade-in-up 0.65s var(--ease-out) both;
+    }
+
+    .animate-in-delay-1 { animation-delay: 0.08s; }
+    .animate-in-delay-2 { animation-delay: 0.16s; }
+    .animate-in-delay-3 { animation-delay: 0.24s; }
 
     .hidden {
       display: none !important;
     }
 
-    header {
-      margin-bottom: 2rem;
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
 
-    header h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      margin: 0 0 0.35rem;
-    }
-
-    header p {
-      margin: 0;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    .app-header-row {
+    .topbar {
+      position: relative;
+      z-index: 2;
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
+      padding: 1rem 1.25rem;
+      max-width: 1100px;
+      margin: 0 auto;
       gap: 1rem;
-      margin-bottom: 2rem;
     }
 
-    .app-header-row header {
-      margin-bottom: 0;
+    .brand {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      background: linear-gradient(120deg, #a78bfa 0%, #818cf8 35%, #38bdf8 90%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      white-space: nowrap;
     }
 
-    .btn-text {
-      flex-shrink: 0;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.85rem;
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      min-height: 2.25rem;
+    }
+
+    .topbar-right.is-hidden {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .user-pill {
+      font-size: 0.8125rem;
       font-weight: 500;
       color: var(--text-muted);
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: inherit;
-      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .btn-text:hover {
+    @media (max-width: 480px) {
+      .user-pill { max-width: 120px; }
+    }
+
+    .btn-ghost {
+      padding: 0.5rem 0.9rem;
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 600;
       color: var(--text);
-      border-color: #3d4a5c;
-      background: var(--surface);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-ghost:active {
+      transform: scale(0.98);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 0 1.25rem 3rem;
+    }
+
+    .wrap--wide {
+      max-width: 640px;
+    }
+
+    .panel-title {
+      margin: 0 0 0.35rem;
+      font-size: 1.625rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .panel-sub {
+      margin: 0 0 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.9375rem;
     }
 
     .auth-tabs {
       display: flex;
       gap: 0.5rem;
       margin-bottom: 1.25rem;
+      padding: 4px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .auth-tabs button {
+    .auth-tabs .tab {
       flex: 1;
-      padding: 0.65rem;
-      font-size: 0.9rem;
-      font-weight: 600;
+      padding: 0.6rem 0.75rem;
       font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
       color: var(--text-muted);
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      background: transparent;
+      border: none;
+      border-radius: 9px;
       cursor: pointer;
-      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      transition: color 0.2s, background 0.2s, box-shadow 0.2s;
     }
 
-    .auth-tabs button.active {
+    .auth-tabs .tab.active {
       color: #fff;
-      background: var(--surface);
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 2px 12px rgba(99, 102, 241, 0.25);
     }
 
-    .auth-msg {
+    #auth-msg {
       margin-bottom: 1rem;
       padding: 0.75rem 1rem;
-      border-radius: 8px;
-      font-size: 0.9rem;
+      border-radius: 12px;
+      font-size: 0.875rem;
       display: none;
     }
 
-    .auth-msg.visible {
+    #auth-msg.visible {
       display: block;
     }
 
-    .auth-msg.error {
-      border: 1px solid var(--error-border);
-      background: var(--error-bg);
-      color: #fca5a5;
+    #auth-msg.error {
+      border: 1px solid rgba(251, 113, 133, 0.45);
+      background: rgba(251, 113, 133, 0.1);
+      color: #fecdd3;
     }
 
-    .auth-msg.ok {
-      border: 1px solid var(--success-border);
-      background: var(--success-bg);
-      color: #86efac;
+    #auth-msg.ok {
+      border: 1px solid rgba(134, 239, 172, 0.4);
+      background: rgba(134, 239, 172, 0.08);
+      color: var(--success);
     }
 
-    form {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    form.glass-form {
+      padding: 1.5rem 1.35rem 1.6rem;
     }
 
     label {
       display: block;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      margin-bottom: 0.35rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
     }
 
     .field {
-      margin-bottom: 1.1rem;
+      margin-bottom: 1.05rem;
     }
 
     .field:last-of-type {
-      margin-bottom: 1.25rem;
+      margin-bottom: 1.2rem;
     }
 
     input {
       width: 100%;
-      padding: 0.65rem 0.85rem;
-      font-size: 1rem;
+      padding: 0.7rem 0.95rem;
+      font-size: 0.9375rem;
       font-family: inherit;
       color: var(--text);
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 11px;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    input::placeholder {
+      color: rgba(244, 244, 248, 0.28);
     }
 
     input:hover {
-      border-color: #3d4a5c;
+      border-color: rgba(255, 255, 255, 0.16);
     }
 
     input:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(61, 139, 253, 0.2);
-    }
-
-    input::placeholder {
-      color: #5c6b7e;
+      border-color: rgba(129, 140, 248, 0.65);
+      box-shadow:
+        0 0 0 3px rgba(99, 102, 241, 0.25),
+        0 0 24px rgba(56, 189, 248, 0.12);
+      background: rgba(8, 6, 20, 0.55);
     }
 
     button[type="submit"] {
       width: 100%;
-      padding: 0.85rem 1rem;
-      font-size: 1rem;
+      padding: 0.88rem 1rem;
+      font-size: 0.9375rem;
       font-weight: 600;
       font-family: inherit;
       color: #fff;
-      background: linear-gradient(180deg, var(--accent) 0%, var(--accent-dim) 100%);
       border: none;
-      border-radius: 8px;
+      border-radius: 11px;
       cursor: pointer;
-      transition: filter 0.15s, transform 0.05s;
+      background: linear-gradient(115deg, #7c3aed 0%, #6366f1 45%, #0ea5e9 100%);
+      background-size: 120% 100%;
+      box-shadow:
+        0 4px 20px rgba(99, 102, 241, 0.35),
+        0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+      transition: filter 0.2s, transform 0.15s, box-shadow 0.25s;
     }
 
     button[type="submit"]:hover:not(:disabled) {
       filter: brightness(1.08);
+      box-shadow:
+        0 6px 28px rgba(124, 58, 237, 0.45),
+        0 0 40px rgba(14, 165, 233, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
     }
 
     button[type="submit"]:active:not(:disabled) {
-      transform: scale(0.99);
+      transform: scale(0.992);
     }
 
     button[type="submit"]:disabled {
-      opacity: 0.65;
+      opacity: 0.55;
       cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .app-intro {
+      margin-bottom: 1.35rem;
+    }
+
+    .app-intro h1 {
+      margin: 0 0 0.35rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .app-intro p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.9375rem;
     }
 
     .result-wrap {
       margin-top: 1.75rem;
     }
 
-    .result-wrap h2 {
-      font-size: 0.75rem;
+    .result-wrap > h2 {
+      font-size: 0.6875rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.1em;
       color: var(--text-muted);
-      margin: 0 0 0.65rem;
+      margin: 0 0 0.75rem;
     }
 
-    .result {
+    .result-card {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .result-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .ai-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(124, 58, 237, 0.5), rgba(14, 165, 233, 0.35));
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      flex-shrink: 0;
+    }
+
+    .ai-badge svg {
+      width: 20px;
+      height: 20px;
+      color: #fff;
+    }
+
+    .result-card-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .result-card-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.1rem;
+    }
+
+    #output {
       display: none;
-      padding: 1.25rem 1.35rem;
-      border-radius: var(--radius);
-      border: 1px solid var(--success-border);
-      background: var(--success-bg);
-      font-size: 1rem;
-      line-height: 1.65;
+      margin: 0;
+      padding: 1.2rem 1.25rem 1.35rem;
+      font-size: 0.9375rem;
+      line-height: 1.7;
       white-space: pre-wrap;
       word-break: break-word;
+      min-height: 3.5rem;
+      color: rgba(244, 244, 248, 0.92);
+      border: none;
+      background: transparent;
+      border-radius: 0;
     }
 
-    .result.visible {
+    #output.visible {
       display: block;
     }
 
-    .result.error {
-      border-color: var(--error-border);
-      background: var(--error-bg);
-      color: #fca5a5;
+    #output.error {
+      color: #fecdd3;
+      background: rgba(251, 113, 133, 0.08);
+    }
+
+    #output:not(.error).visible {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .cursor-blink::after {
+      content: "";
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      margin-left: 2px;
+      vertical-align: -0.15em;
+      background: rgba(129, 140, 248, 0.9);
+      animation: blink 0.9s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div id="auth-panel">
-      <header>
-        <h1>Вход</h1>
-        <p>Войдите или создайте аккаунт, чтобы генерировать отчёты.</p>
-      </header>
+  <div class="bg-stage" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
 
-      <div class="auth-tabs">
+  <header class="topbar animate-in">
+    <span class="brand">ReportAI</span>
+    <div class="topbar-right is-hidden" id="topbar-user">
+      <span id="user-display" class="user-pill" title=""></span>
+      <button type="button" class="btn-ghost" id="logout-btn">Выйти</button>
+    </div>
+  </header>
+
+  <main class="wrap" id="main-wrap">
+    <div id="auth-panel">
+      <div class="animate-in animate-in-delay-1">
+        <h1 class="panel-title">Добро пожаловать</h1>
+        <p class="panel-sub">Войдите или создайте аккаунт, чтобы генерировать отчёты.</p>
+      </div>
+
+      <div class="auth-tabs glass animate-in animate-in-delay-2">
         <button type="button" class="tab active" data-tab="login">Вход</button>
         <button type="button" class="tab" data-tab="register">Регистрация</button>
       </div>
 
-      <div id="auth-msg" class="auth-msg" role="alert"></div>
+      <div id="auth-msg" role="alert"></div>
 
-      <form id="login-form" novalidate>
+      <form id="login-form" class="glass glass-form animate-in animate-in-delay-2" novalidate>
         <div class="field">
           <label for="login-email">Email</label>
           <input id="login-email" type="email" autocomplete="username" required />
@@ -290,7 +524,7 @@
         <button type="submit" id="login-btn">Войти</button>
       </form>
 
-      <form id="register-form" class="hidden" novalidate>
+      <form id="register-form" class="glass glass-form hidden animate-in animate-in-delay-2" novalidate>
         <div class="field">
           <label for="reg-email">Email</label>
           <input id="reg-email" type="email" autocomplete="email" required />
@@ -304,15 +538,12 @@
     </div>
 
     <div id="app-panel" class="hidden">
-      <div class="app-header-row">
-        <header>
-          <h1>Маркетинговый отчёт</h1>
-          <p>Заполните данные за период — получите связный текст для клиента.</p>
-        </header>
-        <button type="button" class="btn-text" id="logout-btn">Выйти</button>
+      <div class="app-intro animate-in">
+        <h1>Маркетинговый отчёт</h1>
+        <p>Заполните данные за период — получите связный текст для клиента.</p>
       </div>
 
-      <form id="report-form" novalidate>
+      <form id="report-form" class="glass glass-form animate-in animate-in-delay-1" novalidate>
         <div class="field">
           <label for="period">Период</label>
           <input id="period" name="period" type="text" placeholder="Апрель 2025" required />
@@ -336,20 +567,36 @@
         <button type="submit" id="submit-btn">Сгенерировать отчёт</button>
       </form>
 
-      <div class="result-wrap">
+      <div class="result-wrap animate-in animate-in-delay-2">
         <h2>Результат</h2>
-        <div id="output" class="result" role="status"></div>
+        <div class="result-card glass" id="result-card">
+          <div class="result-card-header">
+            <div class="ai-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <div>
+              <div class="result-card-title">Отчёт сгенерирован ИИ</div>
+              <div class="result-card-hint">Текст для клиента на русском языке</div>
+            </div>
+          </div>
+          <div id="output" role="status"></div>
+        </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <script>
     (function () {
       var BASE = "https://reportai-production.up.railway.app";
       var TOKEN_KEY = "reportai_token";
+      var EMAIL_KEY = "reportai_email";
 
       var authPanel = document.getElementById("auth-panel");
       var appPanel = document.getElementById("app-panel");
+      var mainWrap = document.getElementById("main-wrap");
       var authMsg = document.getElementById("auth-msg");
       var loginForm = document.getElementById("login-form");
       var registerForm = document.getElementById("register-form");
@@ -359,6 +606,27 @@
       var submitBtn = document.getElementById("submit-btn");
       var output = document.getElementById("output");
       var logoutBtn = document.getElementById("logout-btn");
+      var userDisplay = document.getElementById("user-display");
+      var topbarUser = document.getElementById("topbar-user");
+
+      var typewriterId = 0;
+
+      function syncUserChrome() {
+        var email = localStorage.getItem(EMAIL_KEY) || "";
+        if (email) {
+          userDisplay.textContent = email;
+          userDisplay.title = email;
+          topbarUser.classList.remove("is-hidden");
+        } else if (getToken()) {
+          userDisplay.textContent = "Пользователь";
+          userDisplay.title = "";
+          topbarUser.classList.remove("is-hidden");
+        } else {
+          userDisplay.textContent = "";
+          userDisplay.title = "";
+          topbarUser.classList.add("is-hidden");
+        }
+      }
 
       function showAuthMsg(text, isError) {
         authMsg.textContent = text;
@@ -375,11 +643,15 @@
       function showApp() {
         authPanel.classList.add("hidden");
         appPanel.classList.remove("hidden");
+        mainWrap.classList.add("wrap--wide");
+        syncUserChrome();
       }
 
       function showAuth() {
         appPanel.classList.add("hidden");
         authPanel.classList.remove("hidden");
+        mainWrap.classList.remove("wrap--wide");
+        syncUserChrome();
       }
 
       function getToken() {
@@ -444,6 +716,7 @@
             return;
           }
           setToken(data.access_token);
+          localStorage.setItem(EMAIL_KEY, email);
           showApp();
         } catch (err) {
           showAuthMsg("Не удалось связаться с сервером.", true);
@@ -482,20 +755,46 @@
 
       logoutBtn.addEventListener("click", function () {
         setToken(null);
+        localStorage.removeItem(EMAIL_KEY);
         showAuth();
         switchTab("login");
-        output.classList.remove("visible", "error");
+        output.classList.remove("visible", "error", "cursor-blink");
+        output.textContent = "";
       });
 
       function showResult(text, isError) {
-        output.textContent = text;
+        typewriterId++;
+        var runId = typewriterId;
+        output.classList.remove("cursor-blink");
         output.classList.add("visible");
         output.classList.toggle("error", !!isError);
+
+        if (isError) {
+          output.textContent = text;
+          return;
+        }
+
+        output.textContent = "";
+        output.classList.add("cursor-blink");
+        var i = 0;
+        var speed = 14;
+        function tick() {
+          if (runId !== typewriterId) return;
+          if (i <= text.length) {
+            output.textContent = text.slice(0, i);
+            i++;
+            setTimeout(tick, speed);
+          } else {
+            output.classList.remove("cursor-blink");
+          }
+        }
+        tick();
       }
 
       reportForm.addEventListener("submit", async function (e) {
         e.preventDefault();
-        output.classList.remove("visible", "error");
+        output.classList.remove("visible", "error", "cursor-blink");
+        typewriterId++;
 
         var token = getToken();
         if (!token) {
@@ -536,6 +835,7 @@
 
           if (res.status === 401) {
             setToken(null);
+            localStorage.removeItem(EMAIL_KEY);
             showAuth();
             showAuthMsg("Нужна повторная авторизация.", true);
             return;
