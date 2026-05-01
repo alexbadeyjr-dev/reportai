@@ -1,5 +1,7 @@
 import logging
 import os
+import secrets
+import hashlib
 import sqlite3
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -13,7 +15,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from groq import Groq
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -31,7 +32,6 @@ if JWT_SECRET_KEY == "dev-insecure-change-me":
         "Используется JWT_SECRET_KEY по умолчанию; задайте JWT_SECRET_KEY в .env для продакшена"
     )
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 http_bearer = HTTPBearer()
 
 app = FastAPI(title="Report AI")
@@ -62,6 +62,25 @@ class RegisterBody(BaseModel):
 class LoginBody(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=1)
+
+def _sha256_hex(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def hash_password(password: str) -> str:
+    salt = secrets.token_hex(16)
+    digest = _sha256_hex(f"{salt}:{password}")
+    return f"sha256${salt}${digest}"
+
+
+def verify_password(password: str, stored: str) -> bool:
+    parts = stored.split("$")
+    if len(parts) != 3 or parts[0] != "sha256":
+        return False
+    salt = parts[1]
+    expected = parts[2]
+    digest = _sha256_hex(f"{salt}:{password}")
+    return secrets.compare_digest(digest, expected)
 
 
 def init_db() -> None:
@@ -143,7 +162,7 @@ def health() -> dict[str, str]:
 @app.post("/register")
 def register(body: RegisterBody) -> dict[str, str]:
     email = body.email.strip().lower()
-    password_hash = pwd_context.hash(body.password)
+    password_hash = hash_password(body.password)
     conn = get_db()
     try:
         conn.execute(
@@ -173,7 +192,7 @@ def login(body: LoginBody) -> dict[str, str]:
     finally:
         conn.close()
 
-    if row is None or not pwd_context.verify(body.password, row["password_hash"]):
+    if row is None or not verify_password(body.password, row["password_hash"]):
         logger.info("Неудачный вход: %s", email)
         raise HTTPException(status_code=401, detail="Неверный email или пароль")
 
