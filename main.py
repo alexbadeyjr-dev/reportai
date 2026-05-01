@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from groq import Groq
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -40,6 +42,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.mount("/static", StaticFiles(directory=Path(__file__).resolve().parent), name="static")
 _groq_client: Optional[Groq] = None
 
 
@@ -128,6 +131,11 @@ def startup() -> None:
 
 
 @app.get("/")
+def index() -> FileResponse:
+    return FileResponse(Path(__file__).resolve().parent / "index.html")
+
+
+@app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
 
