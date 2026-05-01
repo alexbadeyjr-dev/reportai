@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Генератор маркетингового отчёта</title>
+  <style>
+    :root {
+      --bg: #0c0f14;
+      --surface: #151a22;
+      --surface-hover: #1c2330;
+      --border: #2a3444;
+      --text: #e8edf4;
+      --text-muted: #8b9cb3;
+      --accent: #3d8bfd;
+      --accent-dim: #2563eb;
+      --success-bg: rgba(34, 197, 94, 0.12);
+      --success-border: rgba(34, 197, 94, 0.35);
+      --error-bg: rgba(239, 68, 68, 0.12);
+      --error-border: rgba(239, 68, 68, 0.4);
+      --radius: 12px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(61, 139, 253, 0.15), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(37, 99, 235, 0.08), transparent);
+    }
+
+    .wrap {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 3rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    header {
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.35rem;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .app-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .app-header-row header {
+      margin-bottom: 0;
+    }
+
+    .btn-text {
+      flex-shrink: 0;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .btn-text:hover {
+      color: var(--text);
+      border-color: #3d4a5c;
+      background: var(--surface);
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .auth-tabs button {
+      flex: 1;
+      padding: 0.65rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text-muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .auth-tabs button.active {
+      color: #fff;
+      background: var(--surface);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .auth-msg {
+      margin-bottom: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .auth-msg.visible {
+      display: block;
+    }
+
+    .auth-msg.error {
+      border: 1px solid var(--error-border);
+      background: var(--error-bg);
+      color: #fca5a5;
+    }
+
+    .auth-msg.ok {
+      border: 1px solid var(--success-border);
+      background: var(--success-bg);
+      color: #86efac;
+    }
+
+    form {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .field {
+      margin-bottom: 1.1rem;
+    }
+
+    .field:last-of-type {
+      margin-bottom: 1.25rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input:hover {
+      border-color: #3d4a5c;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(61, 139, 253, 0.2);
+    }
+
+    input::placeholder {
+      color: #5c6b7e;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: #fff;
+      background: linear-gradient(180deg, var(--accent) 0%, var(--accent-dim) 100%);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: filter 0.15s, transform 0.05s;
+    }
+
+    button[type="submit"]:hover:not(:disabled) {
+      filter: brightness(1.08);
+    }
+
+    button[type="submit"]:active:not(:disabled) {
+      transform: scale(0.99);
+    }
+
+    button[type="submit"]:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .result-wrap {
+      margin-top: 1.75rem;
+    }
+
+    .result-wrap h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin: 0 0 0.65rem;
+    }
+
+    .result {
+      display: none;
+      padding: 1.25rem 1.35rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--success-border);
+      background: var(--success-bg);
+      font-size: 1rem;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .result.visible {
+      display: block;
+    }
+
+    .result.error {
+      border-color: var(--error-border);
+      background: var(--error-bg);
+      color: #fca5a5;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="auth-panel">
+      <header>
+        <h1>Вход</h1>
+        <p>Войдите или создайте аккаунт, чтобы генерировать отчёты.</p>
+      </header>
+
+      <div class="auth-tabs">
+        <button type="button" class="tab active" data-tab="login">Вход</button>
+        <button type="button" class="tab" data-tab="register">Регистрация</button>
+      </div>
+
+      <div id="auth-msg" class="auth-msg" role="alert"></div>
+
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input id="login-email" type="email" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="login-password">Пароль</label>
+          <input id="login-password" type="password" autocomplete="current-password" required />
+        </div>
+        <button type="submit" id="login-btn">Войти</button>
+      </form>
+
+      <form id="register-form" class="hidden" novalidate>
+        <div class="field">
+          <label for="reg-email">Email</label>
+          <input id="reg-email" type="email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="reg-password">Пароль (мин. 6 символов)</label>
+          <input id="reg-password" type="password" autocomplete="new-password" minlength="6" required />
+        </div>
+        <button type="submit" id="register-btn">Зарегистрироваться</button>
+      </form>
+    </div>
+
+    <div id="app-panel" class="hidden">
+      <div class="app-header-row">
+        <header>
+          <h1>Маркетинговый отчёт</h1>
+          <p>Заполните данные за период — получите связный текст для клиента.</p>
+        </header>
+        <button type="button" class="btn-text" id="logout-btn">Выйти</button>
+      </div>
+
+      <form id="report-form" novalidate>
+        <div class="field">
+          <label for="period">Период</label>
+          <input id="period" name="period" type="text" placeholder="Апрель 2025" required />
+        </div>
+        <div class="field">
+          <label for="sessions">Число визитов</label>
+          <input id="sessions" name="sessions" type="number" min="0" step="1" placeholder="0" required />
+        </div>
+        <div class="field">
+          <label for="conversions">Число конверсий</label>
+          <input id="conversions" name="conversions" type="number" min="0" step="1" placeholder="0" required />
+        </div>
+        <div class="field">
+          <label for="ad_spend">Рекламный бюджет USD</label>
+          <input id="ad_spend" name="ad_spend" type="number" min="0" step="0.01" placeholder="0.00" required />
+        </div>
+        <div class="field">
+          <label for="revenue">Доход USD</label>
+          <input id="revenue" name="revenue" type="number" min="0" step="0.01" placeholder="0.00" required />
+        </div>
+        <button type="submit" id="submit-btn">Сгенерировать отчёт</button>
+      </form>
+
+      <div class="result-wrap">
+        <h2>Результат</h2>
+        <div id="output" class="result" role="status"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var BASE = "http://localhost:8000";
+      var TOKEN_KEY = "reportai_token";
+
+      var authPanel = document.getElementById("auth-panel");
+      var appPanel = document.getElementById("app-panel");
+      var authMsg = document.getElementById("auth-msg");
+      var loginForm = document.getElementById("login-form");
+      var registerForm = document.getElementById("register-form");
+      var tabButtons = document.querySelectorAll(".auth-tabs .tab");
+
+      var reportForm = document.getElementById("report-form");
+      var submitBtn = document.getElementById("submit-btn");
+      var output = document.getElementById("output");
+      var logoutBtn = document.getElementById("logout-btn");
+
+      function showAuthMsg(text, isError) {
+        authMsg.textContent = text;
+        authMsg.classList.add("visible");
+        authMsg.classList.toggle("error", !!isError);
+        authMsg.classList.toggle("ok", !isError);
+      }
+
+      function clearAuthMsg() {
+        authMsg.classList.remove("visible", "error", "ok");
+        authMsg.textContent = "";
+      }
+
+      function showApp() {
+        authPanel.classList.add("hidden");
+        appPanel.classList.remove("hidden");
+      }
+
+      function showAuth() {
+        appPanel.classList.add("hidden");
+        authPanel.classList.remove("hidden");
+      }
+
+      function getToken() {
+        return localStorage.getItem(TOKEN_KEY);
+      }
+
+      function setToken(t) {
+        if (t) localStorage.setItem(TOKEN_KEY, t);
+        else localStorage.removeItem(TOKEN_KEY);
+      }
+
+      function switchTab(name) {
+        clearAuthMsg();
+        tabButtons.forEach(function (b) {
+          b.classList.toggle("active", b.getAttribute("data-tab") === name);
+        });
+        if (name === "login") {
+          loginForm.classList.remove("hidden");
+          registerForm.classList.add("hidden");
+        } else {
+          loginForm.classList.add("hidden");
+          registerForm.classList.remove("hidden");
+        }
+      }
+
+      tabButtons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          switchTab(btn.getAttribute("data-tab"));
+        });
+      });
+
+      function parseDetail(data) {
+        if (!data.detail) return "Ошибка сервера";
+        if (typeof data.detail === "string") return data.detail;
+        try {
+          return JSON.stringify(data.detail);
+        } catch (e) {
+          return "Ошибка сервера";
+        }
+      }
+
+      loginForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        clearAuthMsg();
+        var email = document.getElementById("login-email").value.trim();
+        var password = document.getElementById("login-password").value;
+        var btn = document.getElementById("login-btn");
+        btn.disabled = true;
+        try {
+          var res = await fetch(BASE + "/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email, password: password }),
+          });
+          var data = await res.json().catch(function () { return {}; });
+          if (!res.ok) {
+            showAuthMsg(parseDetail(data), true);
+            return;
+          }
+          if (!data.access_token) {
+            showAuthMsg("Нет токена в ответе.", true);
+            return;
+          }
+          setToken(data.access_token);
+          showApp();
+        } catch (err) {
+          showAuthMsg("Не удалось связаться с сервером.", true);
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      registerForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        clearAuthMsg();
+        var email = document.getElementById("reg-email").value.trim();
+        var password = document.getElementById("reg-password").value;
+        var btn = document.getElementById("register-btn");
+        btn.disabled = true;
+        try {
+          var res = await fetch(BASE + "/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email, password: password }),
+          });
+          var data = await res.json().catch(function () { return {}; });
+          if (!res.ok) {
+            showAuthMsg(parseDetail(data), true);
+            return;
+          }
+          showAuthMsg("Аккаунт создан. Войдите с теми же данными.", false);
+          document.getElementById("login-email").value = email;
+          switchTab("login");
+        } catch (err) {
+          showAuthMsg("Не удалось связаться с сервером.", true);
+        } finally {
+          btn.disabled = false;
+        }
+      });
+
+      logoutBtn.addEventListener("click", function () {
+        setToken(null);
+        showAuth();
+        switchTab("login");
+        output.classList.remove("visible", "error");
+      });
+
+      function showResult(text, isError) {
+        output.textContent = text;
+        output.classList.add("visible");
+        output.classList.toggle("error", !!isError);
+      }
+
+      reportForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        output.classList.remove("visible", "error");
+
+        var token = getToken();
+        if (!token) {
+          showAuth();
+          showAuthMsg("Сессия истекла. Войдите снова.", true);
+          return;
+        }
+
+        var period = document.getElementById("period").value.trim();
+        var sessions = parseInt(document.getElementById("sessions").value, 10);
+        var conversions = parseInt(document.getElementById("conversions").value, 10);
+        var adSpend = parseFloat(document.getElementById("ad_spend").value);
+        var revenue = parseFloat(document.getElementById("revenue").value);
+
+        if (!period || isNaN(sessions) || isNaN(conversions) || isNaN(adSpend) || isNaN(revenue)) {
+          showResult("Проверьте, что все поля заполнены корректно.", true);
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Генерация…";
+        try {
+          var res = await fetch(BASE + "/generate-report", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({
+              period: period,
+              sessions: sessions,
+              conversions: conversions,
+              ad_spend: adSpend,
+              revenue: revenue,
+            }),
+          });
+          var data = await res.json().catch(function () { return {}; });
+
+          if (res.status === 401) {
+            setToken(null);
+            showAuth();
+            showAuthMsg("Нужна повторная авторизация.", true);
+            return;
+          }
+
+          if (!res.ok) {
+            showResult(parseDetail(data), true);
+            return;
+          }
+
+          if (typeof data.report !== "string") {
+            showResult("Неожиданный формат ответа.", true);
+            return;
+          }
+
+          showResult(data.report, false);
+        } catch (err) {
+          showResult("Не удалось связаться с сервером.", true);
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Сгенерировать отчёт";
+        }
+      });
+
+      if (getToken()) {
+        showApp();
+      } else {
+        showAuth();
+      }
+    })();
+  </script>
+</body>
+</html>
