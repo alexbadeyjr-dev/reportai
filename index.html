@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ReportAI — маркетинговые отчёты</title>
+  <title>ReportAI — AI-отчёты для агентств</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg-a: #0a0a1a;
@@ -16,22 +16,18 @@
       --glass-bg: rgba(255, 255, 255, 0.06);
       --glass-border: rgba(255, 255, 255, 0.12);
       --input-bg: rgba(8, 6, 20, 0.45);
-      --error: #fb7185;
-      --success: #86efac;
       --radius: 16px;
       --font: "Inter", system-ui, -apple-system, sans-serif;
       --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --indigo: #818cf8;
+      --violet: #a78bfa;
+      --cyan: #22d3ee;
+      --emerald: #34d399;
+      --rose: #fb7185;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      margin: 0;
-      min-height: 100%;
-    }
-
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
     body {
       font-family: var(--font);
       color: var(--text);
@@ -48,74 +44,43 @@
       pointer-events: none;
       overflow: hidden;
     }
-
     .blob {
       position: absolute;
       border-radius: 50%;
       filter: blur(80px);
-      opacity: 0.55;
+      opacity: 0.5;
       animation: blob-float 18s var(--ease-out) infinite;
     }
-
-    .blob-1 {
-      width: min(42vw, 380px);
-      height: min(42vw, 380px);
-      background: #6366f1;
-      top: -8%;
-      left: -6%;
-      animation-delay: 0s;
-    }
-
-    .blob-2 {
-      width: min(50vw, 460px);
-      height: min(50vw, 460px);
-      background: #7c3aed;
-      bottom: -12%;
-      right: -10%;
-      animation-delay: -6s;
-      animation-duration: 22s;
-    }
-
-    .blob-3 {
-      width: min(38vw, 340px);
-      height: min(38vw, 340px);
-      background: #0ea5e9;
-      top: 38%;
-      left: 45%;
-      transform: translateX(-50%);
-      animation-delay: -11s;
-      animation-duration: 20s;
-      opacity: 0.4;
-    }
-
+    .blob-1 { width: min(42vw, 380px); height: min(42vw, 380px); background: #6366f1; top: -8%; left: -6%; }
+    .blob-2 { width: min(50vw, 460px); height: min(50vw, 460px); background: #7c3aed; bottom: -12%; right: -10%; animation-delay: -6s; animation-duration: 22s; }
+    .blob-3 { width: min(38vw, 340px); height: min(38vw, 340px); background: #0ea5e9; top: 38%; left: 45%; transform: translateX(-50%); animation-delay: -11s; opacity: 0.38; }
     @keyframes blob-float {
       0%, 100% { transform: translate(0, 0) scale(1); }
       33% { transform: translate(4%, 6%) scale(1.06); }
       66% { transform: translate(-5%, 3%) scale(0.96); }
     }
 
+    #particles-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
     @keyframes fade-in-up {
-      from {
-        opacity: 0;
-        transform: translateY(16px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-
-    .animate-in {
-      animation: fade-in-up 0.65s var(--ease-out) both;
+    .fade-in-up {
+      animation: fade-in-up 0.7s var(--ease-out) both;
     }
+    .d1 { animation-delay: 0.1s; }
+    .d2 { animation-delay: 0.2s; }
+    .d3 { animation-delay: 0.3s; }
+    .d4 { animation-delay: 0.4s; }
+    .d5 { animation-delay: 0.5s; }
 
-    .animate-in-delay-1 { animation-delay: 0.08s; }
-    .animate-in-delay-2 { animation-delay: 0.16s; }
-    .animate-in-delay-3 { animation-delay: 0.24s; }
-
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     .glass {
       background: var(--glass-bg);
@@ -123,60 +88,284 @@
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
-      box-shadow:
-        0 4px 24px rgba(0, 0, 0, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.06);
     }
 
-    .topbar {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 1.25rem;
-      max-width: 1100px;
-      margin: 0 auto;
-      gap: 1rem;
-    }
-
-    .brand {
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      background: linear-gradient(120deg, #a78bfa 0%, #818cf8 35%, #38bdf8 90%);
+    .brand-gradient {
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(120deg, var(--violet) 0%, var(--indigo) 40%, var(--cyan) 95%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      white-space: nowrap;
     }
 
-    .topbar-right {
+    /* ——— Landing ——— */
+    #landing-screen {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      padding: 1.25rem 1.25rem 3rem;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .hero-float {
+      position: absolute;
+      border-radius: 12px;
+      opacity: 0.35;
+      pointer-events: none;
+      animation: float-y 7s ease-in-out infinite;
+    }
+    .hero-float.f1 { width: 48px; height: 48px; background: linear-gradient(135deg, #6366f1, #a855f7); top: 12%; right: 8%; animation-delay: 0s; }
+    .hero-float.f2 { width: 72px; height: 72px; background: linear-gradient(135deg, #0ea5e9, #6366f1); bottom: 28%; left: 4%; animation-delay: -2s; border-radius: 50%; }
+    .hero-float.f3 { width: 36px; height: 36px; background: linear-gradient(135deg, #c084fc, #22d3ee); top: 42%; right: 18%; animation-delay: -4s; }
+    @keyframes float-y {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-18px) rotate(6deg); }
+    }
+
+    .hero {
+      padding-top: 2.5rem;
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 3rem;
+    }
+    .hero-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.2);
+    }
+    .hero h1 {
+      margin: 0 0 1rem;
+      font-size: clamp(2rem, 6vw, 3.25rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+    .hero-type-line {
+      min-height: 1.5em;
+      font-size: clamp(1rem, 2.8vw, 1.25rem);
+      color: var(--text-muted);
+      font-weight: 500;
+      max-width: 520px;
+      margin: 0 auto 2rem;
+    }
+    .hero-type-line .caret {
+      display: inline-block;
+      width: 2px;
+      height: 1.1em;
+      margin-left: 2px;
+      vertical-align: -0.12em;
+      background: var(--indigo);
+      animation: caret-blink 0.85s step-end infinite;
+    }
+    @keyframes caret-blink { 50% { opacity: 0; } }
+
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 4px 24px rgba(99, 102, 241, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08) inset; }
+      50% { box-shadow: 0 6px 36px rgba(14, 165, 233, 0.45), 0 0 48px rgba(124, 58, 237, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; }
+    }
+
+    .btn-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.95rem 1.75rem;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background: linear-gradient(115deg, #7c3aed 0%, #6366f1 45%, #0ea5e9 100%);
+      background-size: 120% 100%;
+      animation: glow-pulse 2.8s ease-in-out infinite;
+      transition: transform 0.15s, filter 0.2s;
+    }
+    .btn-cta:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .btn-cta:active { transform: translateY(0); }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 768px) {
+      .benefits-grid { grid-template-columns: 1fr; }
+    }
+    .benefit-card {
+      padding: 1.35rem;
+      text-align: left;
+    }
+    .benefit-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(14, 165, 233, 0.2));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .benefit-icon svg { width: 22px; height: 22px; color: #fff; }
+    .benefit-card h3 { margin: 0 0 0.4rem; font-size: 1.05rem; font-weight: 700; }
+    .benefit-card p { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+
+    /* ——— Auth ——— */
+    #auth-panel {
+      position: relative;
+      z-index: 2;
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 1rem 1.25rem 3rem;
+    }
+    .auth-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .btn-back {
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 0.45rem 0.75rem;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s;
+    }
+    .btn-back:hover { color: var(--text); background: rgba(255, 255, 255, 0.1); }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      padding: 4px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .auth-tabs .tab {
+      flex: 1;
+      padding: 0.65rem;
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s;
+    }
+    .auth-tabs .tab.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 2px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .panel-title { margin: 0 0 0.35rem; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; }
+    .panel-sub { margin: 0 0 1.5rem; color: var(--text-muted); font-size: 0.9375rem; }
+
+    form.glass-form { padding: 1.5rem 1.35rem 1.6rem; }
+    label {
+      display: block;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+    .field { margin-bottom: 1.05rem; }
+    .field:last-of-type { margin-bottom: 1.2rem; }
+    input {
+      width: 100%;
+      padding: 0.7rem 0.95rem;
+      font-size: 0.9375rem;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 11px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: rgba(129, 140, 248, 0.65);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), 0 0 24px rgba(56, 189, 248, 0.12);
+    }
+    input::placeholder { color: rgba(244, 244, 248, 0.28); }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.88rem 1rem;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      font-family: inherit;
+      color: #fff;
+      border: none;
+      border-radius: 11px;
+      cursor: pointer;
+      background: linear-gradient(115deg, #7c3aed 0%, #6366f1 45%, #0ea5e9 100%);
+      animation: glow-pulse 3s ease-in-out infinite;
+      transition: filter 0.2s, transform 0.15s, opacity 0.2s;
+    }
+    button[type="submit"]:hover:not(:disabled) { filter: brightness(1.08); }
+    button[type="submit"]:active:not(:disabled) { transform: scale(0.992); }
+    button[type="submit"]:disabled { opacity: 0.55; cursor: not-allowed; animation: none; }
+
+    /* ——— Dashboard ——— */
+    #app-panel {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem 1.25rem 3rem;
+    }
+    .dash-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 0.85rem 1.15rem;
+      margin-bottom: 1.5rem;
+    }
+    .dash-header .brand-mark {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .dash-header-actions {
       display: flex;
       align-items: center;
       gap: 0.65rem;
-      min-height: 2.25rem;
     }
-
-    .topbar-right.is-hidden {
-      visibility: hidden;
-      pointer-events: none;
-    }
-
     .user-pill {
       font-size: 0.8125rem;
       font-weight: 500;
       color: var(--text-muted);
-      max-width: 200px;
+      max-width: min(220px, 45vw);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-
-    @media (max-width: 480px) {
-      .user-pill { max-width: 120px; }
-    }
-
     .btn-ghost {
       padding: 0.5rem 0.9rem;
       font-family: inherit;
@@ -187,219 +376,69 @@
       border: 1px solid var(--glass-border);
       border-radius: 10px;
       cursor: pointer;
-      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      transition: background 0.2s, border-color 0.2s;
     }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
 
-    .btn-ghost:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .btn-ghost:active {
-      transform: scale(0.98);
-    }
-
-    .wrap {
-      position: relative;
-      z-index: 1;
-      max-width: 520px;
-      margin: 0 auto;
-      padding: 0 1.25rem 3rem;
-    }
-
-    .wrap--wide {
-      max-width: 640px;
-    }
-
-    .panel-title {
-      margin: 0 0 0.35rem;
-      font-size: 1.625rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-    }
-
-    .panel-sub {
-      margin: 0 0 1.5rem;
-      color: var(--text-muted);
-      font-size: 0.9375rem;
-    }
-
-    .auth-tabs {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.25rem;
-      padding: 4px;
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .auth-tabs .tab {
-      flex: 1;
-      padding: 0.6rem 0.75rem;
-      font-family: inherit;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      background: transparent;
-      border: none;
-      border-radius: 9px;
-      cursor: pointer;
-      transition: color 0.2s, background 0.2s, box-shadow 0.2s;
-    }
-
-    .auth-tabs .tab.active {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.1);
-      box-shadow: 0 2px 12px rgba(99, 102, 241, 0.25);
-    }
-
-    #auth-msg {
-      margin-bottom: 1rem;
-      padding: 0.75rem 1rem;
-      border-radius: 12px;
-      font-size: 0.875rem;
-      display: none;
-    }
-
-    #auth-msg.visible {
-      display: block;
-    }
-
-    #auth-msg.error {
-      border: 1px solid rgba(251, 113, 133, 0.45);
-      background: rgba(251, 113, 133, 0.1);
-      color: #fecdd3;
-    }
-
-    #auth-msg.ok {
-      border: 1px solid rgba(134, 239, 172, 0.4);
-      background: rgba(134, 239, 172, 0.08);
-      color: var(--success);
-    }
-
-    form.glass-form {
-      padding: 1.5rem 1.35rem 1.6rem;
-    }
-
-    label {
-      display: block;
-      font-size: 0.6875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      margin-bottom: 0.4rem;
-    }
-
-    .field {
-      margin-bottom: 1.05rem;
-    }
-
-    .field:last-of-type {
-      margin-bottom: 1.2rem;
-    }
-
-    input {
-      width: 100%;
-      padding: 0.7rem 0.95rem;
-      font-size: 0.9375rem;
-      font-family: inherit;
-      color: var(--text);
-      background: var(--input-bg);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 11px;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-    }
-
-    input::placeholder {
-      color: rgba(244, 244, 248, 0.28);
-    }
-
-    input:hover {
-      border-color: rgba(255, 255, 255, 0.16);
-    }
-
-    input:focus {
-      outline: none;
-      border-color: rgba(129, 140, 248, 0.65);
-      box-shadow:
-        0 0 0 3px rgba(99, 102, 241, 0.25),
-        0 0 24px rgba(56, 189, 248, 0.12);
-      background: rgba(8, 6, 20, 0.55);
-    }
-
-    button[type="submit"] {
-      width: 100%;
-      padding: 0.88rem 1rem;
-      font-size: 0.9375rem;
-      font-weight: 600;
-      font-family: inherit;
-      color: #fff;
-      border: none;
-      border-radius: 11px;
-      cursor: pointer;
-      background: linear-gradient(115deg, #7c3aed 0%, #6366f1 45%, #0ea5e9 100%);
-      background-size: 120% 100%;
-      box-shadow:
-        0 4px 20px rgba(99, 102, 241, 0.35),
-        0 0 0 1px rgba(255, 255, 255, 0.08) inset;
-      transition: filter 0.2s, transform 0.15s, box-shadow 0.25s;
-    }
-
-    button[type="submit"]:hover:not(:disabled) {
-      filter: brightness(1.08);
-      box-shadow:
-        0 6px 28px rgba(124, 58, 237, 0.45),
-        0 0 40px rgba(14, 165, 233, 0.2),
-        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-    }
-
-    button[type="submit"]:active:not(:disabled) {
-      transform: scale(0.992);
-    }
-
-    button[type="submit"]:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .app-intro {
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
       margin-bottom: 1.35rem;
     }
-
-    .app-intro h1 {
-      margin: 0 0 0.35rem;
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
+    @media (max-width: 640px) {
+      .metrics-row { grid-template-columns: 1fr; }
     }
-
-    .app-intro p {
-      margin: 0;
-      color: var(--text-muted);
-      font-size: 0.9375rem;
+    .metric-card {
+      padding: 1.1rem 1.15rem;
+      position: relative;
+      overflow: hidden;
     }
-
-    .result-wrap {
-      margin-top: 1.75rem;
+    .metric-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 3px 3px 0 0;
     }
+    .metric-card.roas::before { background: linear-gradient(90deg, var(--cyan), var(--indigo)); }
+    .metric-card.conv::before { background: linear-gradient(90deg, var(--emerald), #2dd4bf); }
+    .metric-card.cpl::before { background: linear-gradient(90deg, var(--rose), #f472b6); }
+    .metric-label { font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.35rem; }
+    .metric-value { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 
-    .result-wrap > h2 {
+    .section-title {
       font-size: 0.6875rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: var(--text-muted);
-      margin: 0 0 0.75rem;
+      margin: 0 0 0.65rem;
     }
 
-    .result-card {
-      padding: 0;
-      overflow: hidden;
+    .report-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0 1.25rem 1rem;
     }
+    .btn-secondary {
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 0.5rem 0.85rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
+    .btn-secondary.hidden { display: none; }
 
+    .result-card { padding: 0; overflow: hidden; margin-bottom: 1.5rem; }
     .result-card-header {
       display: flex;
       align-items: center;
@@ -408,36 +447,18 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       background: rgba(0, 0, 0, 0.15);
     }
-
     .ai-badge {
-      width: 36px;
-      height: 36px;
+      width: 36px; height: 36px;
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       background: linear-gradient(135deg, rgba(124, 58, 237, 0.5), rgba(14, 165, 233, 0.35));
       border: 1px solid rgba(255, 255, 255, 0.15);
-      flex-shrink: 0;
     }
-
-    .ai-badge svg {
-      width: 20px;
-      height: 20px;
-      color: #fff;
-    }
-
-    .result-card-title {
-      font-size: 0.875rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-    }
-
-    .result-card-hint {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 0.1rem;
-    }
+    .ai-badge svg { width: 20px; height: 20px; color: #fff; }
+    .result-card-title { font-size: 0.875rem; font-weight: 700; }
+    .result-card-hint { font-size: 0.75rem; color: var(--text-muted); }
 
     #output {
       display: none;
@@ -447,27 +468,13 @@
       line-height: 1.7;
       white-space: pre-wrap;
       word-break: break-word;
-      min-height: 3.5rem;
+      min-height: 3rem;
       color: rgba(244, 244, 248, 0.92);
-      border: none;
       background: transparent;
-      border-radius: 0;
     }
-
-    #output.visible {
-      display: block;
-    }
-
-    #output.error {
-      color: #fecdd3;
-      background: rgba(251, 113, 133, 0.08);
-    }
-
-    #output:not(.error).visible {
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .cursor-blink::after {
+    #output.visible { display: block; }
+    #output.error { color: #fecdd3; background: rgba(251, 113, 133, 0.08); }
+    #output.cursor-blink::after {
       content: "";
       display: inline-block;
       width: 2px;
@@ -475,12 +482,95 @@
       margin-left: 2px;
       vertical-align: -0.15em;
       background: rgba(129, 140, 248, 0.9);
-      animation: blink 0.9s step-end infinite;
+      animation: caret-blink 0.9s step-end infinite;
     }
 
-    @keyframes blink {
-      50% { opacity: 0; }
+    .form-row-loading {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
     }
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-top-color: var(--indigo);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner-wrap { display: none; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-muted); }
+    .spinner-wrap.visible { display: flex; }
+
+    /* History */
+    .history-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .history-item { padding: 0; overflow: hidden; }
+    .history-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      cursor: pointer;
+      flex-wrap: wrap;
+    }
+    .history-head:hover { background: rgba(255, 255, 255, 0.04); }
+    .history-meta { font-size: 0.8125rem; color: var(--text-muted); }
+    .history-period { font-weight: 700; color: var(--text); font-size: 0.9375rem; }
+    .btn-mini {
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.35rem 0.65rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(129, 140, 248, 0.15);
+      color: var(--indigo);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .history-body {
+      display: none;
+      padding: 0 1rem 1rem;
+      font-size: 0.875rem;
+      line-height: 1.65;
+      color: rgba(244, 244, 248, 0.85);
+      white-space: pre-wrap;
+      word-break: break-word;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .history-item.expanded .history-body { display: block; }
+
+    /* Toasts */
+    #toast-root {
+      position: fixed;
+      bottom: 1.25rem;
+      right: 1.25rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      pointer-events: none;
+      max-width: min(360px, calc(100vw - 2rem));
+    }
+    .toast {
+      pointer-events: auto;
+      padding: 0.85rem 1.1rem;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(20, 15, 40, 0.92);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.3s var(--ease-out), transform 0.3s var(--ease-out);
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.err { border-color: rgba(251, 113, 133, 0.4); color: #fecdd3; }
+    .toast.ok { border-color: rgba(52, 211, 153, 0.4); color: #a7f3d0; }
   </style>
 </head>
 <body>
@@ -489,169 +579,247 @@
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
   </div>
+  <canvas id="particles-canvas" aria-hidden="true"></canvas>
 
-  <header class="topbar animate-in">
-    <span class="brand">ReportAI</span>
-    <div class="topbar-right is-hidden" id="topbar-user">
-      <span id="user-display" class="user-pill" title=""></span>
-      <button type="button" class="btn-ghost" id="logout-btn">Выйти</button>
-    </div>
-  </header>
+  <div id="toast-root" aria-live="polite"></div>
 
-  <main class="wrap" id="main-wrap">
-    <div id="auth-panel">
-      <div class="animate-in animate-in-delay-1">
-        <h1 class="panel-title">Добро пожаловать</h1>
-        <p class="panel-sub">Войдите или создайте аккаунт, чтобы генерировать отчёты.</p>
+  <!-- Landing -->
+  <div id="landing-screen">
+    <div class="hero-float f1"></div>
+    <div class="hero-float f2"></div>
+    <div class="hero-float f3"></div>
+
+    <section class="hero">
+      <div class="hero-badge fade-in-up">Для маркетинговых агентств</div>
+      <h1 class="fade-in-up d1"><span class="brand-gradient">ReportAI</span></h1>
+      <p class="hero-type-line fade-in-up d2" id="hero-typewriter"><span class="caret"></span></p>
+      <button type="button" class="btn-cta fade-in-up d3" id="btn-start-free">Начать бесплатно</button>
+    </section>
+
+    <div class="benefits-grid fade-in-up d4">
+      <div class="glass benefit-card">
+        <div class="benefit-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3>10 секунд до текста</h3>
+        <p>Готовый связный отчёт для клиента без рутины — один запрос к ИИ.</p>
       </div>
-
-      <div class="auth-tabs glass animate-in animate-in-delay-2">
-        <button type="button" class="tab active" data-tab="login">Вход</button>
-        <button type="button" class="tab" data-tab="register">Регистрация</button>
+      <div class="glass benefit-card">
+        <div class="benefit-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        </div>
+        <h3>Метрики под контролем</h3>
+        <p>ROAS, конверсия и CPL наглядно после каждого отчёта.</p>
       </div>
-
-      <div id="auth-msg" role="alert"></div>
-
-      <form id="login-form" class="glass glass-form animate-in animate-in-delay-2" novalidate>
-        <div class="field">
-          <label for="login-email">Email</label>
-          <input id="login-email" type="email" autocomplete="username" required />
+      <div class="glass benefit-card">
+        <div class="benefit-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
         </div>
-        <div class="field">
-          <label for="login-password">Пароль</label>
-          <input id="login-password" type="password" autocomplete="current-password" required />
-        </div>
-        <button type="submit" id="login-btn">Войти</button>
-      </form>
-
-      <form id="register-form" class="glass glass-form hidden animate-in animate-in-delay-2" novalidate>
-        <div class="field">
-          <label for="reg-email">Email</label>
-          <input id="reg-email" type="email" autocomplete="email" required />
-        </div>
-        <div class="field">
-          <label for="reg-password">Пароль (мин. 6 символов)</label>
-          <input id="reg-password" type="password" autocomplete="new-password" minlength="6" required />
-        </div>
-        <button type="submit" id="register-btn">Зарегистрироваться</button>
-      </form>
-    </div>
-
-    <div id="app-panel" class="hidden">
-      <div class="app-intro animate-in">
-        <h1>Маркетинговый отчёт</h1>
-        <p>Заполните данные за период — получите связный текст для клиента.</p>
-      </div>
-
-      <form id="report-form" class="glass glass-form animate-in animate-in-delay-1" novalidate>
-        <div class="field">
-          <label for="period">Период</label>
-          <input id="period" name="period" type="text" placeholder="Апрель 2025" required />
-        </div>
-        <div class="field">
-          <label for="sessions">Число визитов</label>
-          <input id="sessions" name="sessions" type="number" min="0" step="1" placeholder="0" required />
-        </div>
-        <div class="field">
-          <label for="conversions">Число конверсий</label>
-          <input id="conversions" name="conversions" type="number" min="0" step="1" placeholder="0" required />
-        </div>
-        <div class="field">
-          <label for="ad_spend">Рекламный бюджет USD</label>
-          <input id="ad_spend" name="ad_spend" type="number" min="0" step="0.01" placeholder="0.00" required />
-        </div>
-        <div class="field">
-          <label for="revenue">Доход USD</label>
-          <input id="revenue" name="revenue" type="number" min="0" step="0.01" placeholder="0.00" required />
-        </div>
-        <button type="submit" id="submit-btn">Сгенерировать отчёт</button>
-      </form>
-
-      <div class="result-wrap animate-in animate-in-delay-2">
-        <h2>Результат</h2>
-        <div class="result-card glass" id="result-card">
-          <div class="result-card-header">
-            <div class="ai-badge" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
-            </div>
-            <div>
-              <div class="result-card-title">Отчёт сгенерирован ИИ</div>
-              <div class="result-card-hint">Текст для клиента на русском языке</div>
-            </div>
-          </div>
-          <div id="output" role="status"></div>
-        </div>
+        <h3>Безопасный вход</h3>
+        <p>JWT и локальная история последних отчётов только в вашем браузере.</p>
       </div>
     </div>
-  </main>
+  </div>
+
+  <!-- Auth -->
+  <div id="auth-panel" class="hidden">
+    <div class="auth-nav fade-in-up">
+      <button type="button" class="btn-back" id="auth-back-btn">← На главную</button>
+      <span class="brand-gradient" style="font-size:1.1rem;font-weight:800;">ReportAI</span>
+    </div>
+    <h1 class="panel-title fade-in-up d1">Добро пожаловать</h1>
+    <p class="panel-sub fade-in-up d1">Войдите или создайте аккаунт.</p>
+
+    <div class="auth-tabs glass fade-in-up d2">
+      <button type="button" class="tab active" data-tab="login">Вход</button>
+      <button type="button" class="tab" data-tab="register">Регистрация</button>
+    </div>
+
+    <form id="login-form" class="glass glass-form fade-in-up d2" novalidate>
+      <div class="field">
+        <label for="login-email">Email</label>
+        <input id="login-email" type="email" autocomplete="username" required />
+      </div>
+      <div class="field">
+        <label for="login-password">Пароль</label>
+        <input id="login-password" type="password" autocomplete="current-password" required />
+      </div>
+      <button type="submit" id="login-btn">Войти</button>
+    </form>
+
+    <form id="register-form" class="glass glass-form hidden fade-in-up d2" novalidate>
+      <div class="field">
+        <label for="reg-email">Email</label>
+        <input id="reg-email" type="email" autocomplete="email" required />
+      </div>
+      <div class="field">
+        <label for="reg-password">Пароль (мин. 6 символов)</label>
+        <input id="reg-password" type="password" autocomplete="new-password" minlength="6" required />
+      </div>
+      <button type="submit" id="register-btn">Зарегистрироваться</button>
+    </form>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="app-panel" class="hidden">
+    <header class="dash-header glass fade-in-up">
+      <span class="brand-gradient brand-mark">ReportAI</span>
+      <div class="dash-header-actions">
+        <span id="user-display" class="user-pill" title=""></span>
+        <button type="button" class="btn-ghost" id="logout-btn">Выйти</button>
+      </div>
+    </header>
+
+    <p class="section-title fade-in-up d1">Последний отчёт — метрики</p>
+    <div class="metrics-row fade-in-up d1">
+      <div class="glass metric-card roas">
+        <div class="metric-label">ROAS</div>
+        <div class="metric-value" id="metric-roas">—</div>
+      </div>
+      <div class="glass metric-card conv">
+        <div class="metric-label">Конверсия</div>
+        <div class="metric-value" id="metric-conv">—</div>
+      </div>
+      <div class="glass metric-card cpl">
+        <div class="metric-label">CPL, USD</div>
+        <div class="metric-value" id="metric-cpl">—</div>
+      </div>
+    </div>
+
+    <p class="section-title fade-in-up d2">Новый отчёт</p>
+    <form id="report-form" class="glass glass-form fade-in-up d2" novalidate>
+      <div class="field">
+        <label for="period">Период</label>
+        <input id="period" name="period" type="text" placeholder="Апрель 2025" required />
+      </div>
+      <div class="field">
+        <label for="sessions">Число визитов</label>
+        <input id="sessions" name="sessions" type="number" min="0" step="1" placeholder="0" required />
+      </div>
+      <div class="field">
+        <label for="conversions">Число конверсий</label>
+        <input id="conversions" name="conversions" type="number" min="0" step="1" placeholder="0" required />
+      </div>
+      <div class="field">
+        <label for="ad_spend">Рекламный бюджет USD</label>
+        <input id="ad_spend" name="ad_spend" type="number" min="0" step="0.01" placeholder="0.00" required />
+      </div>
+      <div class="field">
+        <label for="revenue">Доход USD</label>
+        <input id="revenue" name="revenue" type="number" min="0" step="0.01" placeholder="0.00" required />
+      </div>
+      <button type="submit" id="submit-btn">Сгенерировать отчёт</button>
+      <div class="spinner-wrap" id="report-spinner">
+        <div class="spinner" aria-hidden="true"></div>
+        <span>Генерируем отчёт…</span>
+      </div>
+    </form>
+
+    <p class="section-title fade-in-up d3">Результат</p>
+    <div class="result-card glass fade-in-up d3" id="result-card">
+      <div class="result-card-header">
+        <div class="ai-badge" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div>
+          <div class="result-card-title">Отчёт сгенерирован ИИ</div>
+          <div class="result-card-hint">Текст для клиента на русском языке</div>
+        </div>
+      </div>
+      <div class="report-actions">
+        <button type="button" class="btn-secondary hidden" id="copy-report-btn">Скопировать отчёт</button>
+      </div>
+      <div id="output" role="status"></div>
+    </div>
+
+    <p class="section-title fade-in-up d4">История отчётов</p>
+    <div class="history-list fade-in-up d4" id="history-list"></div>
+  </div>
 
   <script>
     (function () {
       var BASE = "https://reportai-production.up.railway.app";
       var TOKEN_KEY = "reportai_token";
       var EMAIL_KEY = "reportai_email";
+      var HISTORY_KEY = "reportai_history";
 
+      var landingScreen = document.getElementById("landing-screen");
       var authPanel = document.getElementById("auth-panel");
       var appPanel = document.getElementById("app-panel");
-      var mainWrap = document.getElementById("main-wrap");
-      var authMsg = document.getElementById("auth-msg");
+      var btnStartFree = document.getElementById("btn-start-free");
+      var authBackBtn = document.getElementById("auth-back-btn");
       var loginForm = document.getElementById("login-form");
       var registerForm = document.getElementById("register-form");
       var tabButtons = document.querySelectorAll(".auth-tabs .tab");
-
       var reportForm = document.getElementById("report-form");
       var submitBtn = document.getElementById("submit-btn");
       var output = document.getElementById("output");
       var logoutBtn = document.getElementById("logout-btn");
       var userDisplay = document.getElementById("user-display");
-      var topbarUser = document.getElementById("topbar-user");
+      var heroTypewriterEl = document.getElementById("hero-typewriter");
+      var reportSpinner = document.getElementById("report-spinner");
+      var copyReportBtn = document.getElementById("copy-report-btn");
+      var historyListEl = document.getElementById("history-list");
+      var metricRoas = document.getElementById("metric-roas");
+      var metricConv = document.getElementById("metric-conv");
+      var metricCpl = document.getElementById("metric-cpl");
 
+      var toastRoot = document.getElementById("toast-root");
       var typewriterId = 0;
+      var heroTypewriterDone = false;
+      var metricAnimToken = 0;
+
+      var HERO_TEXT = "AI-отчёты для маркетинговых агентств за 10 секунд";
+
+      function toast(msg, kind) {
+        var el = document.createElement("div");
+        el.className = "toast" + (kind === "err" ? " err" : kind === "ok" ? " ok" : "");
+        el.textContent = msg;
+        toastRoot.appendChild(el);
+        requestAnimationFrame(function () { el.classList.add("show"); });
+        setTimeout(function () {
+          el.classList.remove("show");
+          setTimeout(function () { el.remove(); }, 320);
+        }, 3200);
+      }
 
       function syncUserChrome() {
         var email = localStorage.getItem(EMAIL_KEY) || "";
         if (email) {
           userDisplay.textContent = email;
           userDisplay.title = email;
-          topbarUser.classList.remove("is-hidden");
         } else if (getToken()) {
           userDisplay.textContent = "Пользователь";
           userDisplay.title = "";
-          topbarUser.classList.remove("is-hidden");
         } else {
           userDisplay.textContent = "";
           userDisplay.title = "";
-          topbarUser.classList.add("is-hidden");
         }
       }
 
-      function showAuthMsg(text, isError) {
-        authMsg.textContent = text;
-        authMsg.classList.add("visible");
-        authMsg.classList.toggle("error", !!isError);
-        authMsg.classList.toggle("ok", !isError);
+      function showLandingView() {
+        landingScreen.classList.remove("hidden");
+        authPanel.classList.add("hidden");
+        appPanel.classList.add("hidden");
+        if (!heroTypewriterDone) {
+          startHeroTypewriter();
+          heroTypewriterDone = true;
+        }
       }
 
-      function clearAuthMsg() {
-        authMsg.classList.remove("visible", "error", "ok");
-        authMsg.textContent = "";
+      function showAuthView() {
+        landingScreen.classList.add("hidden");
+        authPanel.classList.remove("hidden");
+        appPanel.classList.add("hidden");
       }
 
-      function showApp() {
+      function showDashboardView() {
+        landingScreen.classList.add("hidden");
         authPanel.classList.add("hidden");
         appPanel.classList.remove("hidden");
-        mainWrap.classList.add("wrap--wide");
         syncUserChrome();
-      }
-
-      function showAuth() {
-        appPanel.classList.add("hidden");
-        authPanel.classList.remove("hidden");
-        mainWrap.classList.remove("wrap--wide");
-        syncUserChrome();
+        renderHistory();
+        refreshMetricsFromHistory();
       }
 
       function getToken() {
@@ -663,8 +831,154 @@
         else localStorage.removeItem(TOKEN_KEY);
       }
 
+      function loadHistory() {
+        try {
+          var raw = localStorage.getItem(HISTORY_KEY);
+          var arr = raw ? JSON.parse(raw) : [];
+          return Array.isArray(arr) ? arr : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveHistory(entries) {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(entries.slice(0, 5)));
+      }
+
+      function pushHistoryEntry(entry) {
+        var h = loadHistory();
+        h.unshift(entry);
+        saveHistory(h);
+        renderHistory();
+        animateMetricCards(entry.metrics);
+      }
+
+      function formatHistoryDate(iso) {
+        try {
+          var d = new Date(iso);
+          return d.toLocaleString("ru-RU", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+        } catch (e) {
+          return iso;
+        }
+      }
+
+      function renderHistory() {
+        var items = loadHistory();
+        historyListEl.innerHTML = "";
+        if (!items.length) {
+          var empty = document.createElement("div");
+          empty.className = "glass";
+          empty.style.padding = "1rem";
+          empty.style.fontSize = "0.875rem";
+          empty.style.color = "rgba(244,244,248,0.5)";
+          empty.textContent = "Пока нет сохранённых отчётов — сгенерируйте первый.";
+          historyListEl.appendChild(empty);
+          return;
+        }
+        items.forEach(function (item) {
+          var wrap = document.createElement("div");
+          wrap.className = "history-item glass";
+          wrap.dataset.id = String(item.id);
+          var head = document.createElement("div");
+          head.className = "history-head";
+          var left = document.createElement("div");
+          var periodEl = document.createElement("div");
+          periodEl.className = "history-period";
+          periodEl.textContent = item.period || "—";
+          var meta = document.createElement("div");
+          meta.className = "history-meta";
+          meta.textContent = formatHistoryDate(item.date);
+          left.appendChild(periodEl);
+          left.appendChild(meta);
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "btn-mini";
+          btn.textContent = "Посмотреть";
+          head.appendChild(left);
+          head.appendChild(btn);
+          var body = document.createElement("div");
+          body.className = "history-body";
+          body.textContent = item.report || "";
+          wrap.appendChild(head);
+          wrap.appendChild(body);
+          function toggle() {
+            wrap.classList.toggle("expanded");
+            btn.textContent = wrap.classList.contains("expanded") ? "Свернуть" : "Посмотреть";
+          }
+          btn.addEventListener("click", function (ev) {
+            ev.stopPropagation();
+            toggle();
+          });
+          head.addEventListener("click", toggle);
+          historyListEl.appendChild(wrap);
+        });
+      }
+
+      function refreshMetricsFromHistory() {
+        var items = loadHistory();
+        if (!items.length) {
+          metricRoas.textContent = "—";
+          metricConv.textContent = "—";
+          metricCpl.textContent = "—";
+          return;
+        }
+        animateMetricCards(items[0].metrics);
+      }
+
+      function animateMetricCards(metrics) {
+        if (!metrics) return;
+        metricAnimToken++;
+        var token = metricAnimToken;
+        var dur = 900;
+        var t0 = performance.now();
+        var fromRoas = parseFloat(metricRoas.dataset.value || "0") || 0;
+        var fromConv = parseFloat(metricConv.dataset.value || "0") || 0;
+        var fromCpl = parseFloat(metricCpl.dataset.value || "0") || 0;
+        function easeOutQuad(t) { return 1 - (1 - t) * (1 - t); }
+        function tick(now) {
+          if (token !== metricAnimToken) return;
+          var t = Math.min(1, (now - t0) / dur);
+          var e = easeOutQuad(t);
+          var roas = fromRoas + (metrics.roas - fromRoas) * e;
+          var conv = fromConv + (metrics.conversionPct - fromConv) * e;
+          var cpl = fromCpl + (metrics.cpl - fromCpl) * e;
+          metricRoas.textContent = metrics.roas > 0 || fromRoas > 0 ? roas.toFixed(2) + "×" : "—";
+          metricConv.textContent = (metrics.conversionPct > 0 || fromConv > 0 ? conv.toFixed(2) : "0.00") + "%";
+          metricCpl.textContent = (metrics.cpl > 0 || fromCpl > 0 ? "$" + cpl.toFixed(2) : (metrics.cpl === 0 && metrics.conversionPct >= 0 ? "$0.00" : "—"));
+          if (t < 1) requestAnimationFrame(tick);
+          else {
+            metricRoas.dataset.value = String(metrics.roas);
+            metricConv.dataset.value = String(metrics.conversionPct);
+            metricCpl.dataset.value = String(metrics.cpl);
+            metricRoas.textContent = metrics.roas > 0 ? metrics.roas.toFixed(2) + "×" : "—";
+            metricConv.textContent = (metrics.conversionPct || 0).toFixed(2) + "%";
+            var convs = metrics.conversions != null ? metrics.conversions : 0;
+            metricCpl.textContent =
+              convs > 0 ? "$" + (metrics.cpl || 0).toFixed(2) : "—";
+          }
+        }
+        metricRoas.dataset.value = String(fromRoas);
+        metricConv.dataset.value = String(fromConv);
+        metricCpl.dataset.value = String(fromCpl);
+        requestAnimationFrame(tick);
+      }
+
+      function startHeroTypewriter() {
+        var el = heroTypewriterEl;
+        var i = 0;
+        function step() {
+          if (i <= HERO_TEXT.length) {
+            el.innerHTML = HERO_TEXT.slice(0, i) + '<span class="caret"></span>';
+            i++;
+            setTimeout(step, 38);
+          } else {
+            el.textContent = HERO_TEXT;
+          }
+        }
+        step();
+      }
+
       function switchTab(name) {
-        clearAuthMsg();
         tabButtons.forEach(function (b) {
           b.classList.toggle("active", b.getAttribute("data-tab") === name);
         });
@@ -683,6 +997,14 @@
         });
       });
 
+      btnStartFree.addEventListener("click", function () {
+        showAuthView();
+      });
+
+      authBackBtn.addEventListener("click", function () {
+        showLandingView();
+      });
+
       function parseDetail(data) {
         if (!data.detail) return "Ошибка сервера";
         if (typeof data.detail === "string") return data.detail;
@@ -695,7 +1017,6 @@
 
       loginForm.addEventListener("submit", async function (e) {
         e.preventDefault();
-        clearAuthMsg();
         var email = document.getElementById("login-email").value.trim();
         var password = document.getElementById("login-password").value;
         var btn = document.getElementById("login-btn");
@@ -708,18 +1029,19 @@
           });
           var data = await res.json().catch(function () { return {}; });
           if (!res.ok) {
-            showAuthMsg(parseDetail(data), true);
+            toast(parseDetail(data), "err");
             return;
           }
           if (!data.access_token) {
-            showAuthMsg("Нет токена в ответе.", true);
+            toast("Нет токена в ответе.", "err");
             return;
           }
           setToken(data.access_token);
           localStorage.setItem(EMAIL_KEY, email);
-          showApp();
+          showDashboardView();
+          toast("С возвращением!", "ok");
         } catch (err) {
-          showAuthMsg("Не удалось связаться с сервером.", true);
+          toast("Не удалось связаться с сервером.", "err");
         } finally {
           btn.disabled = false;
         }
@@ -727,7 +1049,6 @@
 
       registerForm.addEventListener("submit", async function (e) {
         e.preventDefault();
-        clearAuthMsg();
         var email = document.getElementById("reg-email").value.trim();
         var password = document.getElementById("reg-password").value;
         var btn = document.getElementById("register-btn");
@@ -740,14 +1061,14 @@
           });
           var data = await res.json().catch(function () { return {}; });
           if (!res.ok) {
-            showAuthMsg(parseDetail(data), true);
+            toast(parseDetail(data), "err");
             return;
           }
-          showAuthMsg("Аккаунт создан. Войдите с теми же данными.", false);
+          toast("Аккаунт создан. Войдите с теми же данными.", "ok");
           document.getElementById("login-email").value = email;
           switchTab("login");
         } catch (err) {
-          showAuthMsg("Не удалось связаться с сервером.", true);
+          toast("Не удалось связаться с сервером.", "err");
         } finally {
           btn.disabled = false;
         }
@@ -756,10 +1077,19 @@
       logoutBtn.addEventListener("click", function () {
         setToken(null);
         localStorage.removeItem(EMAIL_KEY);
-        showAuth();
-        switchTab("login");
+        typewriterId++;
         output.classList.remove("visible", "error", "cursor-blink");
         output.textContent = "";
+        copyReportBtn.classList.add("hidden");
+        metricRoas.textContent = "—";
+        metricConv.textContent = "—";
+        metricCpl.textContent = "—";
+        delete metricRoas.dataset.value;
+        delete metricConv.dataset.value;
+        delete metricCpl.dataset.value;
+        showLandingView();
+        switchTab("login");
+        toast("Вы вышли из аккаунта.", "ok");
       });
 
       function showResult(text, isError) {
@@ -768,6 +1098,7 @@
         output.classList.remove("cursor-blink");
         output.classList.add("visible");
         output.classList.toggle("error", !!isError);
+        copyReportBtn.classList.toggle("hidden", !!isError || !text);
 
         if (isError) {
           output.textContent = text;
@@ -777,7 +1108,7 @@
         output.textContent = "";
         output.classList.add("cursor-blink");
         var i = 0;
-        var speed = 14;
+        var speed = 12;
         function tick() {
           if (runId !== typewriterId) return;
           if (i <= text.length) {
@@ -791,15 +1122,26 @@
         tick();
       }
 
+      copyReportBtn.addEventListener("click", function () {
+        var t = output.textContent || "";
+        if (!t) return;
+        navigator.clipboard.writeText(t).then(function () {
+          toast("Отчёт скопирован в буфер обмена.", "ok");
+        }).catch(function () {
+          toast("Не удалось скопировать.", "err");
+        });
+      });
+
       reportForm.addEventListener("submit", async function (e) {
         e.preventDefault();
         output.classList.remove("visible", "error", "cursor-blink");
+        copyReportBtn.classList.add("hidden");
         typewriterId++;
 
         var token = getToken();
         if (!token) {
-          showAuth();
-          showAuthMsg("Сессия истекла. Войдите снова.", true);
+          showAuthView();
+          toast("Сессия истекла. Войдите снова.", "err");
           return;
         }
 
@@ -811,11 +1153,17 @@
 
         if (!period || isNaN(sessions) || isNaN(conversions) || isNaN(adSpend) || isNaN(revenue)) {
           showResult("Проверьте, что все поля заполнены корректно.", true);
+          toast("Заполните все поля корректно.", "err");
           return;
         }
 
+        var roas = adSpend > 0 ? revenue / adSpend : 0;
+        var convPct = sessions > 0 ? (conversions / sessions) * 100 : 0;
+        var cpl = conversions > 0 ? adSpend / conversions : 0;
+
         submitBtn.disabled = true;
         submitBtn.textContent = "Генерация…";
+        reportSpinner.classList.add("visible");
         try {
           var res = await fetch(BASE + "/generate-report", {
             method: "POST",
@@ -836,34 +1184,105 @@
           if (res.status === 401) {
             setToken(null);
             localStorage.removeItem(EMAIL_KEY);
-            showAuth();
-            showAuthMsg("Нужна повторная авторизация.", true);
+            showAuthView();
+            toast("Нужна повторная авторизация.", "err");
             return;
           }
 
           if (!res.ok) {
             showResult(parseDetail(data), true);
+            toast(parseDetail(data), "err");
             return;
           }
 
           if (typeof data.report !== "string") {
             showResult("Неожиданный формат ответа.", true);
+            toast("Неожиданный формат ответа.", "err");
             return;
           }
 
           showResult(data.report, false);
+          pushHistoryEntry({
+            id: Date.now(),
+            date: new Date().toISOString(),
+            period: period,
+            report: data.report,
+            metrics: { roas: roas, conversionPct: convPct, cpl: cpl, conversions: conversions },
+          });
+          toast("Отчёт готов.", "ok");
         } catch (err) {
           showResult("Не удалось связаться с сервером.", true);
+          toast("Не удалось связаться с сервером.", "err");
         } finally {
           submitBtn.disabled = false;
           submitBtn.textContent = "Сгенерировать отчёт";
+          reportSpinner.classList.remove("visible");
         }
       });
 
+      /* ——— Particles canvas ——— */
+      (function initParticles() {
+        var canvas = document.getElementById("particles-canvas");
+        var ctx = canvas.getContext("2d");
+        var particles = [];
+        var W = 0, H = 0;
+        var count = 55;
+
+        function resize() {
+          W = canvas.width = window.innerWidth;
+          H = canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener("resize", resize);
+
+        for (var i = 0; i < count; i++) {
+          particles.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            vx: (Math.random() - 0.5) * 0.45,
+            vy: (Math.random() - 0.5) * 0.45,
+          });
+        }
+
+        function step() {
+          ctx.clearRect(0, 0, W, H);
+          for (var i = 0; i < particles.length; i++) {
+            var p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > W) p.vx *= -1;
+            if (p.y < 0 || p.y > H) p.vy *= -1;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 1.2, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(129, 140, 248, 0.55)";
+            ctx.fill();
+          }
+          var linkDist = Math.min(W, H) * 0.09;
+          for (var a = 0; a < particles.length; a++) {
+            for (var b = a + 1; b < particles.length; b++) {
+              var dx = particles[a].x - particles[b].x;
+              var dy = particles[a].y - particles[b].y;
+              var d = Math.sqrt(dx * dx + dy * dy);
+              if (d < linkDist) {
+                var alpha = (1 - d / linkDist) * 0.22;
+                ctx.beginPath();
+                ctx.moveTo(particles[a].x, particles[a].y);
+                ctx.lineTo(particles[b].x, particles[b].y);
+                ctx.strokeStyle = "rgba(129, 140, 248, " + alpha + ")";
+                ctx.lineWidth = 0.6;
+                ctx.stroke();
+              }
+            }
+          }
+          requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      })();
+
       if (getToken()) {
-        showApp();
+        showDashboardView();
       } else {
-        showAuth();
+        showLandingView();
       }
     })();
   </script>
